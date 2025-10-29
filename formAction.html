@@ -1,0 +1,193 @@
+    <!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Dados Salvos - Formulários</title>
+    <link rel="stylesheet" href="css/style.css" type="text/css">
+    <style>
+        .users-table { width: 100%; border-collapse: collapse; margin-top: 16px; }
+        .users-table th, .users-table td { padding: 10px 8px; border-bottom: 1px solid #e6e6e6; text-align: left; }
+        .users-actions { margin-top: 12px; display:flex; gap:8px; }
+        .btn-danger { background: #c0392b; color: #fff; border: none; padding: 8px 10px; border-radius:6px; cursor:pointer; }
+        .btn-plain { background: #eee; color:#111; border:none; padding:8px 10px; border-radius:6px; cursor:pointer; }
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <a href="index.html">Home</a>
+        <a href="news.html">News</a>
+        <a href="contact.html">Contact</a>
+        <a href="about.html">About</a>
+    </div>
+
+    <div class="content">
+        <h2 class="titleTop">Dados salvos</h2>
+        <p>Os dados enviados pelo formulário são armazenados localmente no seu navegador (localStorage). Nesta página você pode visualizar e remover registros.</p>
+
+        <div id="usersContainer">
+            <p id="noUsers">Carregando...</p>
+        </div>
+
+        <div class="users-actions">
+            <button id="clearAll" class="btn-danger">Limpar todos</button>
+            <a href="index.html" class="btn-plain">Voltar para catálogo</a>
+        </div>
+    </div>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // If the page was loaded with query parameters (GET), capture them and save to localStorage
+        (function handleQuerySave(){
+            try {
+                var qs = window.location.search.replace(/^\?/, '');
+                if (!qs) return;
+                var params = {};
+                qs.split('&').forEach(function(pair){
+                    var parts = pair.split('=');
+                    if (!parts[0]) return;
+                    var key = decodeURIComponent(parts[0]);
+                    var val = decodeURIComponent((parts[1]||'').replace(/\+/g,' '));
+                    params[key] = val;
+                });
+
+                // Simple validators
+                function isEmail(e) { return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e || ''); }
+                function isDDD(d) { return /^\d{2}$/.test(d || ''); }
+                function isCel(c) { return /^\d{8,9}$/.test(c || ''); }
+
+                // Only attempt to save if there are query params
+                if (Object.keys(params).length === 0) return;
+
+                // Collect validation errors
+                var errors = [];
+                if (!params.nome || !params.nome.trim()) errors.push('Nome é obrigatório.');
+                if (!params.email || !isEmail(params.email.trim())) errors.push('Email inválido.');
+                // accept either params.cel or params.celular
+                var celular = params.cel || params.celular || '';
+                var ddd = params.ddd || params.DDD || '';
+                if (ddd && !isDDD(ddd)) errors.push('DDD deve ter 2 dígitos.');
+                if (celular && !isCel(celular)) errors.push('Número de celular deve ter 8 ou 9 dígitos.');
+
+                if (errors.length) {
+                    // show errors on the page (above usersContainer) if possible
+                    var container = document.getElementById('usersContainer');
+                    var msg = errors.join(' ');
+                    if (container && container.parentNode) {
+                        var errBox = document.createElement('div');
+                        errBox.style.background = '#ffecec';
+                        errBox.style.color = '#900';
+                        errBox.style.padding = '10px';
+                        errBox.style.borderRadius = '6px';
+                        errBox.style.marginBottom = '10px';
+                        errBox.textContent = 'Erro ao salvar: ' + msg;
+                        container.parentNode.insertBefore(errBox, container);
+                    } else {
+                        alert('Erro ao salvar: ' + msg);
+                    }
+                    // remove query params from URL to avoid repeated attempts
+                    if (history && history.replaceState) {
+                        history.replaceState(null, '', window.location.pathname);
+                    }
+                    return;
+                }
+
+                // expected param keys: nome, email, ddd, cel, nasc
+                if (params.nome || params.email) {
+                    var user = {
+                        id: Date.now(),
+                        nome: (params.nome || '').trim(),
+                        email: (params.email || '').trim(),
+                        ddd: ddd || '',
+                        celular: celular || '',
+                        nascimento: params.nasc || params.nascimento || ''
+                    };
+                    // append to localStorage
+                    var existing = [];
+                    try { existing = JSON.parse(localStorage.getItem('users')||'[]'); } catch(e){ existing = []; }
+                    existing.push(user);
+                    localStorage.setItem('users', JSON.stringify(existing));
+                    // remove query parameters from URL to avoid duplicate save on refresh
+                    if (history && history.replaceState) {
+                        history.replaceState(null, '', window.location.pathname);
+                    }
+                }
+            } catch (e) {
+                console.error('Erro ao processar query string:', e);
+            }
+        })();
+        var container = document.getElementById('usersContainer');
+        var noUsers = document.getElementById('noUsers');
+        function render() {
+            var users = [];
+            try { users = JSON.parse(localStorage.getItem('users') || '[]'); } catch(e) { users = []; }
+            container.innerHTML = '';
+            if (!users || users.length === 0) {
+                noUsers.textContent = 'Nenhum registro encontrado.';
+                container.appendChild(noUsers);
+                return;
+            }
+            // create table
+            var table = document.createElement('table');
+            table.className = 'users-table';
+            var thead = document.createElement('thead');
+            thead.innerHTML = '<tr><th>Nome</th><th>Email</th><th>Telefone</th><th>Nasc.</th><th>Ações</th></tr>';
+            table.appendChild(thead);
+            var tbody = document.createElement('tbody');
+            users.forEach(function(u) {
+                var tr = document.createElement('tr');
+                var phone = (u.ddd ? '('+u.ddd+') ' : '') + (u.celular || '');
+                tr.innerHTML = '<td>' + escapeHtml(u.nome) + '</td>' +
+                               '<td>' + escapeHtml(u.email) + '</td>' +
+                               '<td>' + escapeHtml(phone) + '</td>' +
+                               '<td>' + escapeHtml(u.nascimento || '') + '</td>' +
+                               '<td><button data-id="'+u.id+'" class="btn-danger btn-delete">Remover</button></td>';
+                tbody.appendChild(tr);
+            });
+            table.appendChild(tbody);
+            container.appendChild(table);
+
+            // attach delete handlers
+            Array.from(container.querySelectorAll('.btn-delete')).forEach(function(b){
+                b.addEventListener('click', function(){
+                    var id = parseInt(this.getAttribute('data-id'), 10);
+                    var filtered = users.filter(function(x){ return x.id !== id; });
+                    localStorage.setItem('users', JSON.stringify(filtered));
+                    render();
+                });
+            });
+        }
+
+        function escapeHtml(text) {
+            if (!text) return '';
+            return text.replace(/[&<>"]+/g, function(ch){
+                return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[ch];
+            });
+        }
+
+        render();
+
+        var clearAll = document.getElementById('clearAll');
+        clearAll.addEventListener('click', function(){
+            if (!confirm('Remover todos os registros? Essa ação não pode ser desfeita.')) return;
+            localStorage.removeItem('users');
+            render();
+        });
+
+        // open modal contact if clicked in sidebar (same behavior as other pages)
+        var contactBtn = document.getElementById('contactBtn');
+        if (contactBtn) {
+            contactBtn.addEventListener('click', function(e){ e.preventDefault();
+                // try to open modal by dispatching click to any contactBtn on page handled by modal.js
+                var btn = document.getElementById('contactBtn');
+                if (btn) {
+                    // nothing else here; if modal.js is present it will handle
+                }
+                // fallback: navigate to form.html
+                window.location.href = 'form.html';
+            });
+        }
+    });
+    </script>
+</body>
+</html>

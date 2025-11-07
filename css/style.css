@@ -1,15 +1,15 @@
-/* Page background and base styles */
+/* Estilos base e fundo da página */
 body {
     margin: 0;
     font-family: Arial, sans-serif;
     color: #e6eef6;
     min-height: 100vh;
-    /* subtle dark-blue gradient background */
+    /* gradiente azul-escuro suave para o fundo */
     background: linear-gradient(135deg,#0b1220 0%, #12293f 50%, #081523 100%);
     background-attachment: fixed;
 }
 
-/* Top navigation (replaces old sidebar) */
+/* Navegação superior (substitui a barra lateral antiga) */
 .topnav {
     position: fixed;
     top: 0;
@@ -43,7 +43,7 @@ body {
 
 .topnav a.active { background: rgba(255,255,255,0.06); color: #fff; box-shadow: inset 0 -2px 0 rgba(255,255,255,0.03); }
 
-/* Page titles */
+/* Títulos da página */
 .titleTop {
     font-size: 2.1rem;
     margin: 4px 0 6px;
@@ -62,7 +62,7 @@ body {
     opacity: 0.95;
 }
 
-/* Decorative underline under titles */
+/* Linha decorativa sob os títulos */
 .titleTop::after {
     content: '';
     display: block;
@@ -74,9 +74,9 @@ body {
     box-shadow: 0 6px 18px rgba(239,71,111,0.12);
 }
 
-/* Catalog / thumbnail layout (content moved down to clear topnav) */
+/* Layout do catálogo / miniaturas (conteúdo movido para baixo para liberar a navegação) */
 .content {
-    margin-top: 84px; /* keep clear of topnav */
+    margin-top: 84px; /* mantém espaço para a barra de navegação */
     padding: 20px;
 }
 .first,
@@ -90,9 +90,9 @@ body {
     /* Card container: imagem + botão estão dentro do mesmo card. */
     display: flex;
     flex-direction: column;
-    justify-content: flex-start; /* allow button to sit under image */
+    justify-content: flex-start; /* permite que o botão fique abaixo da imagem */
     align-items: stretch;
-    /* layout sizing */
+    /* dimensionamento do layout */
     flex: 1 1 calc(33.333% - 20px);
     max-width: 260px;
     background: #3f3e3e;
@@ -100,7 +100,7 @@ body {
     margin: 5px;
     border-radius: 9px; 
     box-shadow: 0 6px 18px rgba(12, 11, 11, 0.527);
-    overflow: hidden; /* ensure rounded corners clip the image */
+    overflow: hidden; /* garante que as bordas arredondadas cortem a imagem */
     transition: transform 150ms ease, box-shadow 150ms ease;
 }
 .menu:hover {
@@ -112,7 +112,7 @@ body {
     aspect-ratio: 1 / 1;
     object-fit: cover;
     display: block;
-    /* no separate radius needed because .menu has overflow:hidden */
+    /* não precisa de radius separado porque .menu tem overflow:hidden */
     border-radius: 0;
 }
 .menu .modalButton {
@@ -131,14 +131,14 @@ body {
 .menu .modalButton:hover { transform: translateY(-2px); box-shadow: 0 10px 26px rgba(2,6,23,0.28); }
 .menu .modalButton:active { transform: translateY(0); opacity: 0.95; }
 
-/* small arrow after button text */
+/* pequena seta após o texto do botão */
 .menu .modalButton::after {
     content: '\00bb'; /* » */
     margin-left: 8px;
     font-weight: 700;
 }
 
-/* Caption under the image inside the card */
+/* Legenda sob a imagem dentro do card */
 .menu .caption {
     margin: 8px 0 6px;
     text-align: center;
@@ -150,15 +150,15 @@ body {
     text-overflow: ellipsis;
 }
 
-/* Fallback for older browsers that don't support aspect-ratio */
+/* Alternativa para navegadores antigos que não suportam aspect-ratio */
 @supports not (aspect-ratio: 1 / 1) {
     .menu .imgStamp {
-        height: 200px; /* fixed fallback height */
+        height: 200px; /* altura fixa como alternativa */
         width: 100%;
     }
 }
 
-/* Smaller screens: stack items */
+/* Telas menores: empilhar itens */
 @media (max-width: 720px) {
     .menu { flex: 1 1 100%; max-width: none; }
 }
@@ -215,13 +215,13 @@ body {
     color: #334155;
 }
 
-/* small responsive tweak for modal on narrow screens */
+/* ajuste responsivo para modal em telas estreitas */
 @media (max-width: 520px) {
     .content { margin-top: 100px; }
     .modal { left: 50%; top: 50%; transform: translate(-50%, -50%); width: calc(100% - 32px); max-width: none; }
 }
 
-/* Styles for form page (form.html) */
+/* Estilos para página de formulário (form.html) */
 .card-form {
     max-width: 460px;
     margin: 48px auto;
@@ -265,14 +265,14 @@ body {
 }
 .btn-submit:active { transform: translateY(1px); }
 
-/* Responsive: reduce max-width on small screens */
+/* Responsivo: reduzir largura máxima em telas pequenas */
 @media (max-width: 480px) {
     .card-form { margin: 20px; padding: 14px; }
     .card-form .row { gap: 8px; }
     .card-form .col-ddd { flex-basis: 56px; }
 }
 
-/* Contact modal styles */
+/* Estilos do modal de contato */
 .contact-modal { display: none; position: fixed; inset: 0; z-index: 1200; }
 .contact-modal.open { display: block; }
 .contact-modal__overlay {
@@ -285,5 +285,5 @@ body {
 .contact-modal__close {
     position: absolute; right: -8px; top: -28px; background: transparent; border: none; color: #fff; font-size: 28px; cursor: pointer;
 }
-/* ensure the inner form uses card-form styles */
+/* garante que o formulário interno use os estilos de card-form */
 .contact-modal .card-form { box-shadow: 0 8px 36px rgba(0,0,0,0.25); }

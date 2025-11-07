@@ -1,39 +1,82 @@
-.background {
-    background-color: #121212;
-    color: #520000;
+/* Page background and base styles */
+body {
+    margin: 0;
     font-family: Arial, sans-serif;
-    margin: 0;
-    padding: 0;
+    color: #e6eef6;
+    min-height: 100vh;
+    /* subtle dark-blue gradient background */
+    background: linear-gradient(135deg,#0b1220 0%, #12293f 50%, #081523 100%);
+    background-attachment: fixed;
 }
 
-/* Sidebar styles */
-.sidebar {
-    margin: 0;
-    padding: 0;
-    width: 200px;
-    background-color: #181818;
+/* Top navigation (replaces old sidebar) */
+.topnav {
     position: fixed;
-    height: 100%;
-    overflow: auto;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 64px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 0 18px;
+    background: rgba(6,12,20,0.65);
+    backdrop-filter: blur(6px);
+    box-shadow: 0 2px 10px rgba(0,0,0,0.35);
+    z-index: 200;
 }
-.sidebar a {
-    display: block;
-    color: rgb(255, 255, 255);
-    padding: 16px;
+.topnav .brand {
+    color: #ffffff;
+    font-weight: 700;
     text-decoration: none;
+    margin-right: 8px;
 }
-.sidebar a.active {
-    background-color: rgb(0, 17, 36);
-    color: white;
+.topnav a {
+    color: #dbeafe;
+    padding: 10px 12px;
+    text-decoration: none;
+    border-radius: 6px;
+    display: inline-block;
+    font-weight: 600;
 }
-.sidebar a:hover:not(.active) {
-    background-color: rgb(69, 91, 114);
-    color: white;
-}   
+.topnav a:hover { background: rgba(255,255,255,0.06); color: #fff; }
 
-/* Catalog / thumbnail layout */
+.topnav a.active { background: rgba(255,255,255,0.06); color: #fff; box-shadow: inset 0 -2px 0 rgba(255,255,255,0.03); }
+
+/* Page titles */
+.titleTop {
+    font-size: 2.1rem;
+    margin: 4px 0 6px;
+    color: #fff;
+    letter-spacing: 0.6px;
+    font-weight: 800;
+    text-shadow: 0 2px 20px rgba(2,6,12,0.6), 0 1px 0 rgba(0,0,0,0.6);
+}
+.titleBottom {
+    font-size: 1.05rem;
+    margin: 0 0 18px;
+    color: #cfe7ff;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1.6px;
+    opacity: 0.95;
+}
+
+/* Decorative underline under titles */
+.titleTop::after {
+    content: '';
+    display: block;
+    width: 56px;
+    height: 6px;
+    margin-top: 12px;
+    border-radius: 4px;
+    background: linear-gradient(90deg,#ffd166 0%, #ef476f 100%);
+    box-shadow: 0 6px 18px rgba(239,71,111,0.12);
+}
+
+/* Catalog / thumbnail layout (content moved down to clear topnav) */
 .content {
-    margin-left: 200px; /* keep clear of sidebar */
+    margin-top: 84px; /* keep clear of topnav */
     padding: 20px;
 }
 .first,
@@ -73,16 +116,27 @@
     border-radius: 0;
 }
 .menu .modalButton {
-    margin-top: 10px;
+    margin-top: 12px;
     align-self: center;
-    padding: 8px 14px;
+    padding: 10px 16px;
     border: none;
-    background-color: rgb(255, 255, 255);
-    color: #000000;
-    border-radius: 6px;
+    background: linear-gradient(180deg,#ffffff 0%, #f1f1f1 100%);
+    color: #111;
+    border-radius: 20px;
     cursor: pointer;
+    font-weight: 700;
+    box-shadow: 0 6px 18px rgba(2,6,23,0.22);
+    transition: transform 120ms ease, box-shadow 120ms ease, opacity 120ms ease;
 }
-.menu .modalButton:active { transform: translateY(1px); }
+.menu .modalButton:hover { transform: translateY(-2px); box-shadow: 0 10px 26px rgba(2,6,23,0.28); }
+.menu .modalButton:active { transform: translateY(0); opacity: 0.95; }
+
+/* small arrow after button text */
+.menu .modalButton::after {
+    content: '\00bb'; /* » */
+    margin-left: 8px;
+    font-weight: 700;
+}
 
 /* Caption under the image inside the card */
 .menu .caption {
@@ -117,42 +171,54 @@
     left: 50%;
     top: 50%;
     transform: translate(-50%, -50%);
-    background-color: #fff;
-    padding: 20px;
-    border-radius: 8px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    min-width: 300px;
+    background-color: #ffffff;
+    padding: 18px 18px 20px 18px;
+    border-radius: 12px;
+    box-shadow: 0 18px 40px rgba(2,6,23,0.35);
+    min-width: 320px;
+    max-width: 420px;
 }
 
 .modal header {
     position: relative;
-    margin-bottom: 15px;
+    margin-bottom: 12px;
 }
 
 .modal .topright {
     position: absolute;
-    right: -10px;
-    top: -15px;
+    right: 12px;
+    top: 12px;
     color: #333;
-    font-size: 20px;
-    font-weight: bold;
+    font-size: 18px;
+    font-weight: 800;
+    background: #f3f4f6;
+    width: 34px;
+    height: 34px;
+    line-height: 34px;
+    text-align: center;
+    border-radius: 8px;
+    box-shadow: 0 6px 18px rgba(2,6,23,0.08);
     cursor: pointer;
 }
 
-.modal .topright:hover {
-    color: #000;
-}
+.modal .topright:hover { transform: translateY(-2px); background: #fff; }
 
 .modal .infoH {
-    font-size: 1.2em;
-    font-weight: bold;
-    margin-bottom: 10px;
-    color: #333;
+    font-size: 1.15rem;
+    font-weight: 800;
+    margin-bottom: 6px;
+    color: #0b2033;
 }
 
 .modal .info {
     margin: 8px 0;
-    color: #666;
+    color: #334155;
+}
+
+/* small responsive tweak for modal on narrow screens */
+@media (max-width: 520px) {
+    .content { margin-top: 100px; }
+    .modal { left: 50%; top: 50%; transform: translate(-50%, -50%); width: calc(100% - 32px); max-width: none; }
 }
 
 /* Styles for form page (form.html) */

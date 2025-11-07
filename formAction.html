@@ -14,12 +14,13 @@
     </style>
 </head>
 <body>
-    <div class="sidebar">
+    <nav class="topnav">
+        <a class="brand" href="index.html">Koenigsegg</a>
         <a href="index.html">Home</a>
         <a href="news.html">News</a>
         <a href="contact.html">Contact</a>
         <a href="about.html">About</a>
-    </div>
+    </nav>
 
     <div class="content">
         <h2 class="titleTop">Dados salvos</h2>
@@ -174,7 +175,7 @@
             render();
         });
 
-        // open modal contact if clicked in sidebar (same behavior as other pages)
+    // open modal contact if clicked in topnav (same behavior as other pages)
         var contactBtn = document.getElementById('contactBtn');
         if (contactBtn) {
             contactBtn.addEventListener('click', function(e){ e.preventDefault();

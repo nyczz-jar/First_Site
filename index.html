@@ -10,7 +10,7 @@
 
 <body>
     <!-- Menu no topo -->
-    <nav class="topnav">
+    <nav class="topnav" role="navigation" aria-label="Main navigation">
         <a class="brand" href="index.html">Koenigsegg</a>
         <a class="active" href="index.html">Home</a>
         <a href="news.html">News</a>
@@ -23,44 +23,44 @@
         <h1 class="titleTop">Catalog</h1>
         <div class="first">
             <div class="menu">
-                <img class="imgStamp" src="img/catalogo01.jpg">
+                <img class="imgStamp" src="img/catalogo01.jpg" alt="Koenigsegg Gemera">
                 <p class="caption">Koenigsegg Gemera</p>
-                <input class="modalButton" type="button" value="More..." id="Koenig1Button">
+                <button class="modalButton" type="button" id="Koenig1Button">More...</button>
             </div>
             <div class="menu">
-                <img class="imgStamp" src="img/catalogo02.jpg">
+                <img class="imgStamp" src="img/catalogo02.jpg" alt="Koenigsegg Jesko Sadair's Spear">
                 <p class="caption">Koenigsegg Jesko Sadair's Spear</p>
-                <input class="modalButton" type="button" value="More..." id="Koenig2Button">
+                <button class="modalButton" type="button" id="Koenig2Button">More...</button>
             </div>
             <div class="menu">
-                <img class="imgStamp" src="img/catalogo03.jpg">
+                <img class="imgStamp" src="img/catalogo03.jpg" alt="Koenigsegg Agera RS Carbon Edition">
                 <p class="caption">Koenigsegg Agera RS Carbon Edition</p>
-                <input class="modalButton" type="button" value="More..." id="Koenig3Button">
+                <button class="modalButton" type="button" id="Koenig3Button">More...</button>
             </div>
         </div>
         <div class="second">
             <div class="menu">
-                <img class="imgStamp" src="img/catalogo04.jpg">
+                <img class="imgStamp" src="img/catalogo04.jpg" alt="Koenigsegg CCX">
                 <p class="caption">Koenigsegg CCX</p>
-                <input class="modalButton" type="button" value="More..." id="Koenig4Button">
+                <button class="modalButton" type="button" id="Koenig4Button">More...</button>
             </div>
             <div class="menu">
-                <img class="imgStamp" src="img/catalogo05.jpg">
+                <img class="imgStamp" src="img/catalogo05.jpg" alt="Koenigsegg One:1">
                 <p class="caption">Koenigsegg One:1</p>
-                <input class="modalButton" type="button" value="More..." id="Koenig5Button">
+                <button class="modalButton" type="button" id="Koenig5Button">More...</button>
             </div>
             <div class="menu">
-                <img class="imgStamp" src="img/catalogo06.jpg">
+                <img class="imgStamp" src="img/catalogo06.jpg" alt="Koenigsegg Gemera">
                 <p class="caption">Koenigsegg Gemera</p>
-                <input class="modalButton" type="button" value="More..." id="Koenig6Button">
+                <button class="modalButton" type="button" id="Koenig6Button">More...</button>
             </div>
         </div>
     </div>
 
     <!-- Modal Detalhes -->
-    <div id="knowMore" class="modal">
+    <div id="knowMore" class="modal" role="dialog" aria-modal="true" aria-labelledby="txt1" aria-describedby="txt2" tabindex="-1">
         <header>
-            <span id="closeModalButton" class="topright">X</span>
+            <button id="closeModalButton" class="topright" aria-label="Close">X</button>
         </header>
         <div>
             <p id="txt1" class="infoH"></p>
@@ -72,6 +72,5 @@
 
     <!-- Referência ao arquivo Javascript -->
     <script src="js/main.js"></script>
-    <script src="js/form.js"></script>
 </body>
 </html>

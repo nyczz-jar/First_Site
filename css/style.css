@@ -180,14 +180,13 @@ body {
 }
 
 .modal header {
-    position: relative;
-    margin-bottom: 12px;
+    display: block;
 }
 
 .modal .topright {
     position: absolute;
-    right: -15px;
-    top: -15px;
+    right: 5px;
+    top: 5px;
     color: #333;
     font-size: 18px;
     font-weight: 800;
@@ -206,6 +205,7 @@ body {
     font-size: 1.15rem;
     font-weight: 800;
     margin-bottom: 6px;
+    /* margin-top: 4px; */
     color: #0b2033;
 }
 

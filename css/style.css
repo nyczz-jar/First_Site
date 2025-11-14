@@ -186,15 +186,14 @@ body {
 
 .modal .topright {
     position: absolute;
-    right: 12px;
-    top: 12px;
+    right: -15px;
+    top: -15px;
     color: #333;
     font-size: 18px;
     font-weight: 800;
     background: #f3f4f6;
     width: 34px;
     height: 34px;
-    line-height: 34px;
     text-align: center;
     border-radius: 8px;
     box-shadow: 0 6px 18px rgba(2,6,23,0.08);

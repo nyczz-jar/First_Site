@@ -88,7 +88,7 @@ document.addEventListener('keydown', function(event) {
     }
 });
 
-// Adiciona os event listeners para os botões "Saiba mais"
+// Adiciona os event listeners para os botões "More..."
 document.addEventListener('DOMContentLoaded', function() {
     // Botões de cada carro
     document.getElementById('Koenig1Button').addEventListener('click', function() { openModal(1); });

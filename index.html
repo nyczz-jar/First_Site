@@ -6,6 +6,44 @@
     <link rel="icon" href="img/Wcolorlog.png" type="image/png">
     <title>Koenigsegg Store</title>
     <link rel="stylesheet" href="css/style.css" type="text/css">
+    <script src="js/auth.js"></script>
+    <script>
+        // Verifica autenticação assim que a página começa a carregar
+        requireAuth();
+    </script>
+    <style>
+        .navbar-right {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-left: auto;
+        }
+
+        .navbar-right .user-info {
+            color: white;
+            font-size: 13px;
+            max-width: 150px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .navbar-right .btn-logout {
+            background-color: #ff6b35;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 600;
+            transition: background-color 0.2s;
+        }
+
+        .navbar-right .btn-logout:hover {
+            background-color: #e55a2b;
+        }
+    </style>
 </head>
 
 <body>
@@ -16,6 +54,10 @@
         <a href="news.html">News</a>
         <a href="contact.html">Contact</a>
         <a href="about.html">About</a>
+        <div class="navbar-right">
+            <div class="user-info" id="userInfo"></div>
+            <button class="btn-logout" onclick="handleLogout()">Logout</button>
+        </div>
     </nav>
 
     <!-- Aqui define o conteúdo da página principal -->
@@ -72,5 +114,23 @@
 
     <!-- Referência ao arquivo Javascript -->
     <script src="js/main.js"></script>
+    <script>
+        // Exibe informações do usuário logado
+        document.addEventListener('DOMContentLoaded', function() {
+            const auth = getAuth();
+            const userInfo = document.getElementById('userInfo');
+            if (auth && userInfo) {
+                userInfo.textContent = 'Olá, ' + (auth.email.split('@')[0] || auth.email);
+            }
+        });
+
+        // Função de logout
+        function handleLogout() {
+            if (confirm('Tem certeza que deseja fazer logout?')) {
+                logout();
+                window.location.href = 'login.html';
+            }
+        }
+    </script>
 </body>
 </html>

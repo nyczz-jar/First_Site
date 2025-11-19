@@ -41,17 +41,20 @@ function isValidEmailOrPhone(value) {
  * Mostra mensagem de alerta na página de login
  */
 function showAlert(message, type = 'error') {
+    // Prefer modal alert if present
+    const modalAlert = document.getElementById('loginAlert');
     const alertBox = document.getElementById('alertBox');
-    if (!alertBox) return;
+    const target = modalAlert || alertBox;
+    if (!target) return;
 
-    alertBox.className = `alert ${type}`;
-    alertBox.textContent = message;
-    alertBox.style.display = 'block';
+    target.className = `alert ${type}`;
+    target.textContent = message;
+    target.style.display = 'block';
 
     // Auto-hide em 5 segundos se for sucesso
     if (type === 'success') {
         setTimeout(() => {
-            alertBox.style.display = 'none';
+            target.style.display = 'none';
         }, 5000);
     }
 }
@@ -60,17 +63,23 @@ function showAlert(message, type = 'error') {
  * Mostra/limpa erro em campo específico
  */
 function setFieldError(fieldId, show = true) {
-    const field = document.getElementById(fieldId);
-    const errorElement = document.getElementById(fieldId + 'Error');
+    // Tenta campo normal, senão busca modal equivalents (modalEmail/modalPassword)
+    let field = document.getElementById(fieldId);
+    let errorElement = document.getElementById(fieldId + 'Error');
+    if (!field || !errorElement) {
+        const modalFieldId = 'modal' + fieldId.charAt(0).toUpperCase() + fieldId.slice(1);
+        field = document.getElementById(modalFieldId) || field;
+        errorElement = document.getElementById(modalFieldId + 'Error') || errorElement;
+    }
 
     if (!field || !errorElement) return;
 
     if (show) {
         field.classList.add('error');
-        errorElement.classList.add('show');
+        errorElement.style.display = 'block';
     } else {
         field.classList.remove('error');
-        errorElement.classList.remove('show');
+        errorElement.style.display = 'none';
     }
 }
 
@@ -89,7 +98,8 @@ function validateForm() {
         isValid = false;
     } else if (!isValidEmailOrPhone(email)) {
         setFieldError('email', true);
-        document.getElementById('emailError').textContent = 'Email ou telefone inválido';
+        const emailErr = document.getElementById('emailError') || document.getElementById('modalEmailError');
+        if (emailErr) emailErr.textContent = 'Email ou telefone inválido';
         isValid = false;
     } else {
         setFieldError('email', false);
@@ -123,8 +133,8 @@ async function handleLogin(event) {
 
     const email = document.getElementById('email').value.trim();
     const password = document.getElementById('password').value;
-    const submitBtn = document.getElementById('submitBtn');
-    const loading = document.getElementById('loading');
+    let submitBtn = document.getElementById('submitBtn') || document.getElementById('modalSubmitBtn');
+    let loading = document.getElementById('loading') || null;
 
     // Desabilita botão e mostra loading
     if (submitBtn) submitBtn.disabled = true;
@@ -146,11 +156,16 @@ async function handleLogin(event) {
                 });
 
                 showAlert('Login realizado com sucesso!', 'success');
-
-                // Redireciona para index após 1 segundo
-                setTimeout(() => {
-                    window.location.href = 'index.html';
-                }, 1000);
+                // Se o login foi acionado a partir do modal, apenas feche o modal e atualize UI.
+                // Caso contrário (página dedicada login.html), redirecione para index.
+                const path = window.location.pathname || '';
+                const page = path.substring(path.lastIndexOf('/') + 1);
+                if (page === 'login.html') {
+                    setTimeout(() => { location.replace('index.html'); }, 1000);
+                } else {
+                    hideLoginModal();
+                    updateUserInfoUI();
+                }
             } else {
                 showAlert('Email/Telefone ou senha incorretos', 'error');
             }
@@ -184,11 +199,14 @@ async function handleLogin(event) {
             });
 
             showAlert('Login realizado com sucesso!', 'success');
-
-            // Redireciona para index
-            setTimeout(() => {
-                window.location.href = 'index.html';
-            }, 1000);
+            const path = window.location.pathname || '';
+            const page = path.substring(path.lastIndexOf('/') + 1);
+            if (page === 'login.html') {
+                setTimeout(() => { location.replace('index.html'); }, 1000);
+            } else {
+                hideLoginModal();
+                updateUserInfoUI();
+            }
         } else {
             showAlert(data.message || 'Email/Telefone ou senha incorretos', 'error');
         }
@@ -197,8 +215,8 @@ async function handleLogin(event) {
         showAlert('Erro ao conectar ao servidor. Tente novamente.', 'error');
     } finally {
         // Re-habilita botão e esconde loading
-        if (submitBtn) submitBtn.disabled = false;
-        if (loading) loading.style.display = 'none';
+            if (submitBtn) submitBtn.disabled = false;
+            if (loading) loading.style.display = 'none';
     }
 }
 
@@ -290,8 +308,107 @@ function isUsingBackend() {
  */
 function requireAuth() {
     if (!isAuthenticated()) {
-        // Redireciona para login
-        window.location.href = 'login.html';
+        // Se houver suporte a modal, carregue-o e exiba; caso contrário, redirecione para login.html
+        if (typeof loadLoginModal === 'function') {
+            loadLoginModal().then(() => {
+                showLoginModal();
+            }).catch(() => {
+                location.replace('login.html');
+            });
+        } else {
+            location.replace('login.html');
+        }
+    }
+}
+
+/** Modal: carregar, mostrar e esconder **/
+let _loginModalLoaded = false;
+async function loadLoginModal() {
+    if (_loginModalLoaded) return;
+    try {
+        const resp = await fetch('components/login-modal.html');
+        if (!resp.ok) throw new Error('não carregou');
+        const html = await resp.text();
+        const container = document.createElement('div');
+        container.innerHTML = html;
+        document.body.appendChild(container);
+        _loginModalLoaded = true;
+
+        // Map modal fields to generic handlers used by auth.js
+        // Move values between modal inputs and expected ids
+        const modalEmail = document.getElementById('modalEmail');
+        const modalPassword = document.getElementById('modalPassword');
+        const modalEmailError = document.getElementById('modalEmailError');
+        const modalPasswordError = document.getElementById('modalPasswordError');
+        const modalAlert = document.getElementById('loginAlert');
+
+        // When auth.js calls setFieldError or showAlert, these will map to modal elements if present.
+        // Attach close behavior
+        const closeBtn = document.getElementById('loginModalClose');
+        if (closeBtn) closeBtn.addEventListener('click', hideLoginModal);
+
+        // Ensure modal form fields are wired to main handlers by id mapping
+        // If handleLogin expects elements with ids 'email' and 'password', copy on submit
+        const modalForm = document.getElementById('modalLoginForm');
+        if (modalForm) {
+            modalForm.addEventListener('submit', function(e){
+                e.preventDefault();
+                // copy modal values into temporary inputs expected by validateForm
+                ensureTempInputsForModal(modalEmail.value, modalPassword.value);
+                handleLogin(e);
+            });
+        }
+
+    } catch (err) {
+        _loginModalLoaded = false;
+        throw err;
+    }
+}
+
+function ensureTempInputsForModal(emailVal, passVal) {
+    // Create or update hidden inputs with ids expected by validateForm/handleLogin
+    let e = document.getElementById('email');
+    if (!e) {
+        e = document.createElement('input');
+        e.type = 'hidden';
+        e.id = 'email';
+        document.body.appendChild(e);
+    }
+    let p = document.getElementById('password');
+    if (!p) {
+        p = document.createElement('input');
+        p.type = 'hidden';
+        p.id = 'password';
+        document.body.appendChild(p);
+    }
+    e.value = emailVal;
+    p.value = passVal;
+}
+
+function showLoginModal() {
+    const overlay = document.getElementById('loginModalOverlay');
+    if (!overlay) return;
+    overlay.style.display = 'flex';
+    // move modal values into hidden inputs if present
+}
+
+function hideLoginModal() {
+    const overlay = document.getElementById('loginModalOverlay');
+    if (!overlay) return;
+    overlay.style.display = 'none';
+    // cleanup temporary hidden inputs
+    const e = document.getElementById('email');
+    const p = document.getElementById('password');
+    if (e && e.type === 'hidden') e.remove();
+    if (p && p.type === 'hidden') p.remove();
+}
+
+function updateUserInfoUI() {
+    // Atualiza elementos da interface que mostram usuário logado
+    const auth = getAuth();
+    const userInfo = document.getElementById('userInfo');
+    if (auth && userInfo) {
+        userInfo.textContent = 'Olá, ' + (auth.email.split('@')[0] || auth.email);
     }
 }
 
@@ -299,13 +416,21 @@ function requireAuth() {
  * Inicializa página de login
  */
 document.addEventListener('DOMContentLoaded', function() {
-    // Se já está autenticado, redireciona para index
-    if (isAuthenticated()) {
-        window.location.href = 'index.html';
+    // Somente execute comportamento de página de login aqui.
+    // Evita redirecionamentos automáticos em outras páginas (causa de reload/piscar).
+    var path = window.location.pathname || '';
+    var page = path.substring(path.lastIndexOf('/') + 1);
+
+    // Se já está autenticado e estamos na página de login, encaminhe para index.html
+    if (isAuthenticated() && page === 'login.html') {
+        location.replace('index.html');
         return;
     }
 
-    // Focus no campo de email
+    // Apenas executar foco e listeners se estivermos na página de login
+    if (page !== 'login.html') return;
+
+    // Focus no campo de email (somente em login.html)
     const emailInput = document.getElementById('email');
     if (emailInput) emailInput.focus();
 

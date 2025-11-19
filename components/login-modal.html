@@ -1,0 +1,28 @@
+<div id="loginModalOverlay" style="position:fixed;inset:0;background:rgba(0,0,0,0.55);display:flex;align-items:center;justify-content:center;z-index:9999;">
+  <div id="loginModal" style="background:#fff;border-radius:12px;padding:32px;max-width:420px;width:96%;box-shadow:0 20px 60px rgba(0,0,0,0.4);position:relative;">
+    <button id="loginModalClose" aria-label="Fechar" style="position:absolute;right:12px;top:12px;border:none;background:transparent;font-size:18px;cursor:pointer;">×</button>
+    <div style="text-align:center;margin-bottom:20px;">
+      <div style="color:#ff6b35;font-weight:600;font-size:18px;">Koenigsegg</div>
+      <h2 style="margin:8px 0 0 0;">Login</h2>
+      <p style="color:#666;font-size:13px;">Entre com suas credenciais para acessar o site</p>
+    </div>
+
+    <div id="loginAlert" class="alert" style="display:none;margin-bottom:12px;padding:10px;border-radius:8px;"></div>
+
+    <form id="modalLoginForm" style="margin-top:6px;" onsubmit="handleLogin(event)">
+      <div style="margin-bottom:12px;">
+        <label for="modalEmail" style="display:block;margin-bottom:6px;font-weight:600;color:#333;">Email ou Telefone</label>
+        <input id="modalEmail" name="email" type="text" placeholder="seu@email.com ou (11) 91234-5678" style="width:100%;padding:10px 12px;border-radius:8px;border:1px solid #ddd;">
+        <div id="modalEmailError" class="error-message" style="display:none;color:#e74c3c;font-size:12px;margin-top:6px;">Email ou telefone é obrigatório</div>
+      </div>
+
+      <div style="margin-bottom:12px;">
+        <label for="modalPassword" style="display:block;margin-bottom:6px;font-weight:600;color:#333;">Senha</label>
+        <input id="modalPassword" name="password" type="password" placeholder="Sua senha" style="width:100%;padding:10px 12px;border-radius:8px;border:1px solid #ddd;">
+        <div id="modalPasswordError" class="error-message" style="display:none;color:#e74c3c;font-size:12px;margin-top:6px;">Senha é obrigatória</div>
+      </div>
+
+      <button id="modalSubmitBtn" type="submit" style="width:100%;padding:12px 14px;border-radius:8px;background:linear-gradient(135deg,#ff6b35,#ff5722);color:#fff;border:none;font-weight:700;">LOGIN</button>
+    </form>
+  </div>
+</div>

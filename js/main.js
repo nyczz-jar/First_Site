@@ -1,9 +1,9 @@
 function openModal(car) {
-    var modal = document.getElementById("knowMore");
-    var txt1 = document.getElementById("txt1");
-    var txt2 = document.getElementById("txt2");
-    var txt3 = document.getElementById("txt3");
-    var txt4 = document.getElementById("txt4");
+    const modal = document.getElementById("knowMore");
+    const txt1 = document.getElementById("txt1");
+    const txt2 = document.getElementById("txt2");
+    const txt3 = document.getElementById("txt3");
+    const txt4 = document.getElementById("txt4");
     
     // Limpa o conteúdo anterior
     txt1.innerHTML = "";
@@ -11,62 +11,84 @@ function openModal(car) {
     txt3.innerHTML = "";
     txt4.innerHTML = "";
     
-    switch (car) {
-        case 1:
-            txt1.innerHTML = "Koenigsegg Gemera";
-            txt2.innerHTML = "Velocidade máxima de 404 km/h.";
-            txt3.innerHTML = "Aceleração de 0 a 100 km/h em 1,9 segundos.";
-            txt4.innerHTML = "Seu preço parte de: $3.700.000"; 
-            break;
-        case 2:
-            txt1.innerHTML = "Koenigsegg Sadair's Spear Edition";
-            txt2.innerHTML = "Velocidade máxima de 360 km/h.";
-            txt3.innerHTML = "Aceleração de 0 a 100 km/h em 2,5 segundos.";
-            txt4.innerHTML = "Seu preço parte de: $5.000.000";
-            break;
-        case 3:
-            txt1.innerHTML = "Koenigsegg Agera RS";
-            txt2.innerHTML = "Velocidade máxima de 447 km/h (227.9 mph).";
-            txt3.innerHTML = "Aceleração de 0 a 100 km/h em 2,8 segundos.";
-            txt4.innerHTML = "Seu preço parte de: $2.200.000";
-            break;
-        case 4:
-            txt1.innerHTML = "Koenigsegg CCX";
-            txt2.innerHTML = "Velocidade máxima de 395 km/h (245 mph).";
-            txt3.innerHTML = "Aceleração de 0 a 100 km/h em 3,2 segundos.";
-            txt4.innerHTML = "Seu preço parte de: $1.550.000";
-            break;
-        case 5:
-            txt1.innerHTML = "Koenigsegg One:1";
-            txt2.innerHTML = "Velocidade máxima de 440 km/h (273 mph).";
-            txt3.innerHTML = "Aceleração de 0 a 100 km/h em 2,7 segundos.";
-            txt4.innerHTML = "Seu preço parte de: $7.200.000";
-            break;
-        case 6:
-            txt1.innerHTML = "Koenigsegg Gemera";
-            txt2.innerHTML = "Velocidade máxima de 400 km/h (249 mph).";
-            txt3.innerHTML = "Aceleração de 0 a 100 km/h em 1,9 segundos.";
-            txt4.innerHTML = "Seu Preço parte de: $3.702.000";
-            break;
+    const carData = {
+        1: {
+            title: "Koenigsegg Gemera",
+            speed: "Top speed: 404 km/h.",
+            accel: "0-100 km/h in 1.9 seconds.",
+            price: "Starting at: $3,700,000"
+        },
+        2: {
+            title: "Koenigsegg Jesko Sadair's Spear Edition",
+            speed: "Top speed: 360 km/h.",
+            accel: "0-100 km/h in 2.5 seconds.",
+            price: "Starting at: $5,000,000"
+        },
+        3: {
+            title: "Koenigsegg Agera RS",
+            speed: "Top speed: 447 km/h (227.9 mph).",
+            accel: "0-100 km/h in 2.8 seconds.",
+            price: "Starting at: $2,200,000"
+        },
+        4: {
+            title: "Koenigsegg CCX",
+            speed: "Top speed: 395 km/h (245 mph).",
+            accel: "0-100 km/h in 3.2 seconds.",
+            price: "Starting at: $1,550,000"
+        },
+        5: {
+            title: "Koenigsegg One:1",
+            speed: "Top speed: 440 km/h (273 mph).",
+            accel: "0-100 km/h in 2.7 seconds.",
+            price: "Starting at: $7,200,000"
+        },
+        6: {
+            title: "Koenigsegg Gemera",
+            speed: "Top speed: 400 km/h (249 mph).",
+            accel: "0-100 km/h in 1.9 seconds.",
+            price: "Starting at: $3,702,000"
+        }
+    };
+
+    const info = carData[car];
+    if (info) {
+        txt1.textContent = info.title;
+        txt2.textContent = info.speed;
+        txt3.textContent = info.accel;
+        txt4.textContent = info.price;
     }
-        // Exibe o modal
+    // Exibe o modal
     modal.style.display = "block";
+    // Foca no modal
+    modal.focus();
 }
 
 function closeModal() {
-    var modal = document.getElementById("knowMore");
+    const modal = document.getElementById("knowMore");
     modal.style.display = "none";
-}
-
-// Fecha o modal quando clicar fora dele
-window.onclick = function(event) {
-    var modal = document.getElementById("knowMore");
-    if (event.target == modal) {
-        closeModal();
+    const firstButton = document.getElementById('Koenig1Button');
+    if (firstButton) {
+        firstButton.focus();
     }
 }
 
-// Adiciona os event listeners para os botões "Saiba mais"
+// Fecha o modal quando clicar fora dele
+document.addEventListener('click', function (event) {
+    const modal = document.getElementById("knowMore");
+    if (modal && event.target === modal) {
+        closeModal();
+    }
+});
+
+// Fecha o modal com a tecla ESC
+document.addEventListener('keydown', function(event) {
+    const modal = document.getElementById("knowMore");
+    if (event.key === 'Escape' && modal && modal.style.display === 'block') {
+        closeModal();
+    }
+});
+
+// Adiciona os event listeners para os botões "More..."
 document.addEventListener('DOMContentLoaded', function() {
     // Botões de cada carro
     document.getElementById('Koenig1Button').addEventListener('click', function() { openModal(1); });
@@ -75,7 +97,7 @@ document.addEventListener('DOMContentLoaded', function() {
     document.getElementById('Koenig4Button').addEventListener('click', function() { openModal(4); });
     document.getElementById('Koenig5Button').addEventListener('click', function() { openModal(5); });
     document.getElementById('Koenig6Button').addEventListener('click', function() { openModal(6); });
-    
+
     // Botão de fechar o modal
     document.getElementById('closeModalButton').addEventListener('click', closeModal);
 });

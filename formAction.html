@@ -38,7 +38,7 @@
 
     <script>
     document.addEventListener('DOMContentLoaded', function () {
-        // If the page was loaded with query parameters (GET), capture them and save to localStorage
+        // Se a página foi carregada com parâmetros de consulta (GET), capture-os e salve-os no localStorage.
         (function handleQuerySave(){
             try {
                 var qs = window.location.search.replace(/^\?/, '');
@@ -52,26 +52,30 @@
                     params[key] = val;
                 });
 
-                // Simple validators
+                // Validadores simples
                 function isEmail(e) { return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e || ''); }
                 function isDDD(d) { return /^\d{2}$/.test(d || ''); }
                 function isCel(c) { return /^\d{8,9}$/.test(c || ''); }
 
-                // Only attempt to save if there are query params
+                // Só tente salvar se houver parâmetros de consulta.
                 if (Object.keys(params).length === 0) return;
 
-                // Collect validation errors
+                // Coleta erros de validação
                 var errors = [];
                 if (!params.nome || !params.nome.trim()) errors.push('Nome é obrigatório.');
                 if (!params.email || !isEmail(params.email.trim())) errors.push('Email inválido.');
-                // accept either params.cel or params.celular
+
+                // aceita DDD e celular opcionais, mas se fornecidos, devem ser válidos
                 var celular = params.cel || params.celular || '';
                 var ddd = params.ddd || params.DDD || '';
+                // normalize: remove any non-digit characters coming from formatted inputs (ex: 91234-5678 or (11) 91234-5678)
+                celular = (celular || '').replace(/\D+/g, '');
+                ddd = (ddd || '').replace(/\D+/g, '');
                 if (ddd && !isDDD(ddd)) errors.push('DDD deve ter 2 dígitos.');
                 if (celular && !isCel(celular)) errors.push('Número de celular deve ter 8 ou 9 dígitos.');
 
                 if (errors.length) {
-                    // show errors on the page (above usersContainer) if possible
+                    // mostra erros na página
                     var container = document.getElementById('usersContainer');
                     var msg = errors.join(' ');
                     if (container && container.parentNode) {
@@ -86,14 +90,14 @@
                     } else {
                         alert('Erro ao salvar: ' + msg);
                     }
-                    // remove query params from URL to avoid repeated attempts
+                    // remove parametros da URL para evitar repetição ao atualizar
                     if (history && history.replaceState) {
                         history.replaceState(null, '', window.location.pathname);
                     }
                     return;
                 }
 
-                // expected param keys: nome, email, ddd, cel, nasc
+                // parâmetros experados: nome, email, ddd, cel/celular, nasc/nascimento
                 if (params.nome || params.email) {
                     var user = {
                         id: Date.now(),
@@ -108,7 +112,7 @@
                     try { existing = JSON.parse(localStorage.getItem('users')||'[]'); } catch(e){ existing = []; }
                     existing.push(user);
                     localStorage.setItem('users', JSON.stringify(existing));
-                    // remove query parameters from URL to avoid duplicate save on refresh
+                    // remove os parametros da query string para evitar repetição ao atualizar
                     if (history && history.replaceState) {
                         history.replaceState(null, '', window.location.pathname);
                     }
@@ -128,7 +132,7 @@
                 container.appendChild(noUsers);
                 return;
             }
-            // create table
+            //cria tabela
             var table = document.createElement('table');
             table.className = 'users-table';
             var thead = document.createElement('thead');
@@ -148,7 +152,7 @@
             table.appendChild(tbody);
             container.appendChild(table);
 
-            // attach delete handlers
+            // atachar eventos de remoção
             Array.from(container.querySelectorAll('.btn-delete')).forEach(function(b){
                 b.addEventListener('click', function(){
                     var id = parseInt(this.getAttribute('data-id'), 10);
@@ -175,16 +179,16 @@
             render();
         });
 
-    // open modal contact if clicked in topnav (same behavior as other pages)
+    // abre o modal de contato se houver botão na página
         var contactBtn = document.getElementById('contactBtn');
         if (contactBtn) {
             contactBtn.addEventListener('click', function(e){ e.preventDefault();
-                // try to open modal by dispatching click to any contactBtn on page handled by modal.js
+                // tenta abrir o modal de contato
                 var btn = document.getElementById('contactBtn');
                 if (btn) {
-                    // nothing else here; if modal.js is present it will handle
+                    // Nada mais aqui; se o arquivo modal.js estiver presente, ele cuidará do resto.
                 }
-                // fallback: navigate to form.html
+                // em caso de falha navegar para form.html
                 window.location.href = 'form.html';
             });
         }

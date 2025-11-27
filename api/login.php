@@ -28,6 +28,18 @@
  * }
  */
 
+/**
+ * Método personalizado para verificar uma senha.
+ *
+ * @param string $password: A senha fornecida pelo usuário.
+ * @param string $inputPassword: Senha armazenada no banco de dados.
+ * @return bool Retorna TRUE se a senha coincidir, FALSE caso contrário.
+ */
+function verifyPasswordCustom($password, $inputPassword) {
+    return $password === $inputPassword;
+}
+
+
 // Define o header como JSON
 header('Content-Type: application/json');
 header('Access-Control-Allow-Origin: *');
@@ -71,8 +83,6 @@ try {
     // AQUI: Adicione sua lógica de autenticação com banco de dados
     // ===================================================================
     
-    // EXEMPLO DE BANCO DE DADOS (usando PDO):
-    /*
     try {
         $pdo = new PDO('mysql:host=localhost;dbname=koenigsegg', 'root', '');
         $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
@@ -85,11 +95,11 @@ try {
         }
 
         // Busca usuário por email ou telefone
-        $stmt = $pdo->prepare("SELECT id, email, phone, password FROM users WHERE email = ? OR phone = ?");
-        $stmt->execute([$email, $emailOrPhone]);
+        $stmt = $pdo->prepare("SELECT id, email, senha FROM users WHERE email = ?");
+        $stmt->execute([$email]);
         $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
-        if (!$user || !password_verify($password, $user['password'])) {
+        if (!$user || !verifyPasswordCustom($password, $user['senha'])) {
             http_response_code(401);
             echo json_encode(['success' => false, 'message' => 'Email ou senha incorretos']);
             exit();
@@ -99,8 +109,8 @@ try {
         $token = bin2hex(random_bytes(32));
 
         // Opcionalmente, armazena token no banco para validações futuras
-        $stmt = $pdo->prepare("UPDATE users SET last_login = NOW() WHERE id = ?");
-        $stmt->execute([$user['id']]);
+        // $stmt = $pdo->prepare("UPDATE users SET last_login = NOW() WHERE id = ?");
+        // $stmt->execute([$user['id']]);
 
         http_response_code(200);
         echo json_encode([
@@ -117,7 +127,7 @@ try {
         echo json_encode(['success' => false, 'message' => 'Erro ao conectar ao banco de dados']);
         exit();
     }
-    */
+
 
     // ===================================================================
     // EXEMPLO DE VALIDAÇÃO LOCAL (para testes - remova em produção)

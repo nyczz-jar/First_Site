@@ -12,6 +12,9 @@ const API_CONFIG = {
     validateEndpoint: 'api/validate.php'
 };
 
+// Se true, qualquer página interna diferente de login.html redireciona para login quando não autenticado
+const FORCE_REDIRECT_UNAUTH = true;
+
 /**
  * Valida se um email é válido
  */
@@ -299,7 +302,7 @@ function validateLocalUser(email, password) {
  */
 function isUsingBackend() {
     // Mude para true quando estiver usando seu PHP backend
-    return false;
+    return true;
 }
 
 /**
@@ -323,6 +326,8 @@ function requireAuth() {
 
 /** Modal: carregar, mostrar e esconder **/
 let _loginModalLoaded = false;
+let _loginModalEscHandler = null;
+let _loginModalOverlay = null;
 async function loadLoginModal() {
     if (_loginModalLoaded) return;
     try {
@@ -345,7 +350,20 @@ async function loadLoginModal() {
         // When auth.js calls setFieldError or showAlert, these will map to modal elements if present.
         // Attach close behavior
         const closeBtn = document.getElementById('loginModalClose');
-        if (closeBtn) closeBtn.addEventListener('click', hideLoginModal);
+        // Close button is hidden for persistent modal; do not attach a close handler
+        if (closeBtn) closeBtn.style.display = 'none';
+
+        // Prevent clicks on the overlay from closing the modal
+        _loginModalOverlay = document.getElementById('loginModalOverlay');
+        if (_loginModalOverlay) {
+            _loginModalOverlay.addEventListener('click', function(e){
+                if (e.target === _loginModalOverlay) {
+                    // Swallow clicks on backdrop so modal remains persistent
+                    e.stopPropagation();
+                    e.preventDefault();
+                }
+            });
+        }
 
         // Ensure modal form fields are wired to main handlers by id mapping
         // If handleLogin expects elements with ids 'email' and 'password', copy on submit
@@ -389,6 +407,23 @@ function showLoginModal() {
     const overlay = document.getElementById('loginModalOverlay');
     if (!overlay) return;
     overlay.style.display = 'flex';
+    // Prevent page background interaction (no scroll)
+    try { document.body.style.overflow = 'hidden'; } catch (e) {}
+
+    // Prevent ESC from closing modal while it's persistent
+    if (!_loginModalEscHandler) {
+        _loginModalEscHandler = function(e) {
+            if (e.key === 'Escape') {
+                // If modal is visible, swallow ESC key
+                const ov = document.getElementById('loginModalOverlay');
+                if (ov && ov.style.display === 'flex') {
+                    e.preventDefault();
+                    e.stopPropagation();
+                }
+            }
+        };
+        document.addEventListener('keydown', _loginModalEscHandler, true);
+    }
     // move modal values into hidden inputs if present
 }
 
@@ -396,6 +431,14 @@ function hideLoginModal() {
     const overlay = document.getElementById('loginModalOverlay');
     if (!overlay) return;
     overlay.style.display = 'none';
+    // restore page scroll
+    try { document.body.style.overflow = ''; } catch (e) {}
+    // remove ESC handler
+    if (_loginModalEscHandler) {
+        document.removeEventListener('keydown', _loginModalEscHandler, true);
+        _loginModalEscHandler = null;
+    }
+    // allow overlay clicks to be garbage-collected (listener remains on element removed later if page unloads)
     // cleanup temporary hidden inputs
     const e = document.getElementById('email');
     const p = document.getElementById('password');
@@ -421,6 +464,12 @@ document.addEventListener('DOMContentLoaded', function() {
     var path = window.location.pathname || '';
     var page = path.substring(path.lastIndexOf('/') + 1);
 
+    // Se configurado para forçar redirect e não autenticado, redireciona imediatamente para login
+    if (FORCE_REDIRECT_UNAUTH && !isAuthenticated() && page !== 'login.html') {
+        location.replace('login.html');
+        return;
+    }
+
     // Se já está autenticado e estamos na página de login, encaminhe para index.html
     if (isAuthenticated() && page === 'login.html') {
         location.replace('index.html');
@@ -445,4 +494,38 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     });
+});
+
+// Intercepta cliques em links internos e força redirecionamento para login.html
+document.addEventListener('DOMContentLoaded', function() {
+    document.body.addEventListener('click', function(e) {
+        const a = e.target.closest && e.target.closest('a');
+        if (!a) return;
+        const href = a.getAttribute('href');
+        if (!href) return;
+
+        // Ignora âncoras, mailto, tel e javascript: links
+        if (href.startsWith('#') || href.startsWith('mailto:') || href.startsWith('tel:') || href.startsWith('javascript:')) return;
+
+        // Resolve URL relativo para verificar origem
+        let url;
+        try {
+            url = new URL(href, window.location.href);
+        } catch (err) {
+            return; // não é um URL válido
+        }
+
+        // Ignora links externos
+        if (url.origin !== window.location.origin) return;
+
+        // Se for link para login.html, permita
+        const targetPage = url.pathname.substring(url.pathname.lastIndexOf('/') + 1);
+        if (targetPage === 'login.html') return;
+
+        // Se não autenticado, previne navegação e redireciona para login
+        if (!isAuthenticated()) {
+            e.preventDefault();
+            location.replace('login.html');
+        }
+    }, true);
 });

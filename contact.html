@@ -24,9 +24,17 @@
         <div class="card-form">
             <h2>Contact / Registration</h2>
             <p>Fill out the form to sign in or register your details.</p>
-            <form id="userForm" action="formAction.html" method="get">
+
+            <!-- Tabs: Details / Password -->
+            <div class="tabs" role="tablist" aria-label="Form sections">
+                <button type="button" class="tab-button active" data-target="detailsTab" role="tab" aria-selected="true">Details</button>
+                <button type="button" class="tab-button" data-target="passwordTab" role="tab" aria-selected="false">Password</button>
+            </div>
+
+            <form id="userForm">
                 <label for="nome">Full name</label>
-                <input type="text" id="nome" name="nome" placeholder="Your full name" required>
+                <div id="detailsTab" class="tab-panel">
+                    <input type="text" id="nome" name="nome" placeholder="Your full name" required>
 
                 <label for="email">Email</label>
                 <input type="email" id="email" name="email" placeholder="you@example.com" required>
@@ -46,6 +54,15 @@
 
                 <label for="nasc">Date of birth</label>
                 <input type="date" id="nasc" name="nasc" required>
+                </div>
+
+                <div id="passwordTab" class="tab-panel" style="display:none;">
+                    <label for="password">Password (required to login)</label>
+                    <input type="password" id="password" name="password" placeholder="Enter a password (min 6 chars)" required>
+
+                    <label for="password2">Confirm password</label>
+                    <input type="password" id="password2" name="password2" placeholder="Repeat the password" required>
+                </div>
 
                 <button type="submit" class="btn-submit">Sign In / Submit</button>
             </form>
@@ -53,5 +70,12 @@
     </div>
 
     <script src="js/form.js"></script>
+    <style>
+        /* Tabs styling for contact form */
+        .tabs { display: flex; gap: 8px; margin: 8px 0 12px; }
+        .tab-button { background: transparent; border: 1px solid rgba(0,0,0,0.06); padding: 6px 10px; border-radius: 6px; cursor: pointer; font-weight:700; }
+        .tab-button.active { background: #0b2033; color: #fff; border-color: rgba(0,0,0,0.08); }
+        .tab-panel { margin-top: 6px; }
+    </style>
 </body>
 </html>

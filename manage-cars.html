@@ -178,6 +178,8 @@
         .cars-table td {
             padding: 12px 16px;
             border-bottom: 1px solid #e6e6e6;
+            /* texto em tom de preto semitransparente para melhor legibilidade */
+            color: rgba(0, 0, 0, 0.75);
         }
 
         .cars-table tbody tr:hover {
@@ -213,6 +215,12 @@
             height: 30px;
             animation: spin 1s linear infinite;
             margin: 0 auto 10px;
+        }
+
+        /* Títulos dentro da área de gerenciamento: usar preto semitransparente */
+        .form-container h2,
+        .manage-content > h2 {
+            color: rgba(0, 0, 0, 0.85);
         }
 
         @keyframes spin {

@@ -36,7 +36,10 @@
  * @return bool Retorna TRUE se a senha coincidir, FALSE caso contrário.
  */
 function verifyPasswordCustom($password, $inputPassword) {
-    return $password === $inputPassword;
+    // If password in DB is a hash, use password_verify.
+    if (password_verify($password, $inputPassword)) return true;
+    // Fallback: some legacy rows may store plaintext (not recommended)
+    return hash_equals($inputPassword, $password);
 }
 
 
